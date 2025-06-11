@@ -1,15 +1,16 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { createInterface } from "readline";
+import { createInterface, Interface } from "readline";
+import { WrappedListApplicationsOutputSchema } from "../src/index.js";
 
 // 建立使用者輸入介面
-const userInput = createInterface({
+const userInput: Interface = createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
 // 初始化 MCP 客戶端
-async function initClient() {
+async function initClient(): Promise<Client> {
   try {
     console.log("正在連接到 Mac Apps Launcher MCP 伺服器...");
 
@@ -36,8 +37,20 @@ async function initClient() {
   }
 }
 
+// 定義應用程式列表的介面
+interface ApplicationsResponse {
+  applications: string[];
+  [key: string]: any;
+}
+
+// 定義啟動應用程式的回應介面
+interface LaunchAppResponse {
+  message: string;
+  [key: string]: any;
+}
+
 // 列出所有可用工具
-async function listTools(client) {
+async function listTools(client: Client): Promise<void> {
   try {
     console.log("正在獲取可用工具列表...");
     const tools = await client.listTools();
@@ -51,7 +64,7 @@ async function listTools(client) {
 }
 
 // 列出所有應用程式
-async function listApplications(client) {
+async function listApplications(client: Client): Promise<void> {
   try {
     console.log("正在獲取應用程式列表...");
     const result = await client.callTool({
@@ -59,21 +72,24 @@ async function listApplications(client) {
       arguments: {},
     });
 
+    // 使用 Zod 驗證結果
+    const validatedResult = WrappedListApplicationsOutputSchema.parse(result);
+
     console.log("已安裝的應用程式:");
-    if (result && result.applications) {
-      result.applications.forEach((app, index) => {
+    console.log(validatedResult);
+
+    validatedResult.toolResult.applications.forEach(
+      (app: string, index: number) => {
         console.log(`${index + 1}. ${app}`);
-      });
-    } else {
-      console.log("未找到應用程式或返回格式不正確");
-    }
+      }
+    );
   } catch (error) {
     console.error("獲取應用程式列表時發生錯誤:", error);
   }
 }
 
 // 啟動應用程式
-async function launchApp(client, appName) {
+async function launchApp(client: Client, appName: string): Promise<void> {
   try {
     console.log(`正在啟動應用程式: ${appName}...`);
     const result = await client.callTool({
@@ -90,7 +106,11 @@ async function launchApp(client, appName) {
 }
 
 // 用應用程式開啟檔案
-async function openWithApp(client, appName, filePath) {
+async function openWithApp(
+  client: Client,
+  appName: string,
+  filePath: string
+): Promise<void> {
   try {
     console.log(`正在用 ${appName} 開啟檔案: ${filePath}...`);
     const result = await client.callTool({
@@ -108,7 +128,7 @@ async function openWithApp(client, appName, filePath) {
 }
 
 // 顯示選單
-function showMenu() {
+function showMenu(): void {
   console.log("\nMac Apps Launcher MCP 伺服器測試客戶端");
   console.log("請選擇要測試的功能:");
   console.log("1. 列出可用的工具");
@@ -119,12 +139,12 @@ function showMenu() {
 }
 
 // 主函數
-async function main() {
+async function main(): Promise<void> {
   try {
     const client = await initClient();
     showMenu();
 
-    userInput.on("line", async (input) => {
+    userInput.on("line", async (input: string) => {
       switch (input.trim()) {
         case "1":
           await listTools(client);
@@ -137,18 +157,21 @@ async function main() {
         case "3":
           userInput.question(
             "請輸入要啟動的應用程式名稱: ",
-            async (appName) => {
+            async (appName: string) => {
               await launchApp(client, appName);
               showMenu();
             }
           );
           break;
         case "4":
-          userInput.question("請輸入應用程式名稱: ", (appName) => {
-            userInput.question("請輸入要開啟的檔案路徑: ", async (filePath) => {
-              await openWithApp(client, appName, filePath);
-              showMenu();
-            });
+          userInput.question("請輸入應用程式名稱: ", (appName: string) => {
+            userInput.question(
+              "請輸入要開啟的檔案路徑: ",
+              async (filePath: string) => {
+                await openWithApp(client, appName, filePath);
+                showMenu();
+              }
+            );
           });
           break;
         case "0":

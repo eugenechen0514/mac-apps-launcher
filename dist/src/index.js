@@ -52,10 +52,17 @@ const server = new Server({
         tools: {},
     },
 });
+// helper
+function wrapToolResultSchema(schema) {
+    return z.object({
+        toolResult: schema,
+    });
+}
 // Define schemas
 const ListApplicationsOutputSchema = z.object({
     applications: z.array(z.string()),
 });
+export const WrappedListApplicationsOutputSchema = wrapToolResultSchema(ListApplicationsOutputSchema);
 const LaunchAppInputSchema = z.object({
     appName: z.string(),
 });
