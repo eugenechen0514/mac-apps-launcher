@@ -14,7 +14,8 @@
     "build": "tsc && shx chmod +x dist/src/*.js",
     "prepare": "npm run build",
     "watch": "tsc --watch",
-    "start": "node dist/src/index.js"
+    "start": "node dist/src/index.js",
+    "test:client": "node client/test-mcp-client.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.12.1",
