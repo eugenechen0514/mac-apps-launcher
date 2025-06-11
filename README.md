@@ -20,8 +20,7 @@ Add the following to your Claude Config JSON file
     "simulator": {
       "command": "npx",
       "args": [
-        "y",
-        "@joshuarileydev/mac-apps-launcher-mcp-server"
+        "@eugenechen/mac-apps-launcher-mcp-server"
       ]
     }
   }
