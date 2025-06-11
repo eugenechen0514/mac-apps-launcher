@@ -1,7 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { createInterface } from "readline";
-import { WrappedListApplicationsOutputSchema } from "../src/index.js";
+import { WrappedLaunchAppOutputSchema, WrappedListApplicationsOutputSchema, WrappedOpenWithAppOutputSchema, } from "../src/index.js";
 // 建立使用者輸入介面
 const userInput = createInterface({
     input: process.stdin,
@@ -53,7 +53,7 @@ async function listApplications(client) {
             name: "list_applications",
             arguments: {},
         });
-        // 使用 Zod 驗證結果
+        // validate result
         const validatedResult = WrappedListApplicationsOutputSchema.parse(result);
         console.log("已安裝的應用程式:");
         console.log(validatedResult);
@@ -75,7 +75,9 @@ async function launchApp(client, appName) {
                 appName: appName,
             },
         });
-        console.log(`結果: ${result.message}`);
+        // validate result
+        const validatedResult = WrappedLaunchAppOutputSchema.parse(result);
+        console.log(`結果: ${validatedResult.toolResult.message}`);
     }
     catch (error) {
         console.error("啟動應用程式時發生錯誤:", error);
@@ -92,7 +94,9 @@ async function openWithApp(client, appName, filePath) {
                 filePath: filePath,
             },
         });
-        console.log(`結果: ${result.message}`);
+        // validate result
+        const validatedResult = WrappedOpenWithAppOutputSchema.parse(result);
+        console.log(`結果: ${validatedResult.toolResult.message}`);
     }
     catch (error) {
         console.error("用應用程式開啟檔案時發生錯誤:", error);

@@ -88,6 +88,9 @@ const LaunchAppOutputSchema = z.object({
   success: z.boolean(),
   message: z.string(),
 });
+export const WrappedLaunchAppOutputSchema = wrapToolResultSchema(
+  LaunchAppOutputSchema
+);
 
 const OpenWithAppInputSchema = z.object({
   appName: z.string(),
@@ -98,6 +101,9 @@ const OpenWithAppOutputSchema = z.object({
   success: z.boolean(),
   message: z.string(),
 });
+export const WrappedOpenWithAppOutputSchema = wrapToolResultSchema(
+  OpenWithAppOutputSchema
+);
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
