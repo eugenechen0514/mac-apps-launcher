@@ -1,11 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { createInterface, Interface } from "readline";
-import {
-  WrappedLaunchAppOutputSchema,
-  WrappedListApplicationsOutputSchema,
-  WrappedOpenWithAppOutputSchema,
-} from "../index.js";
 
 // 建立使用者輸入介面
 const userInput: Interface = createInterface({
@@ -41,18 +36,6 @@ async function initClient(): Promise<Client> {
   }
 }
 
-// 定義應用程式列表的介面
-interface ApplicationsResponse {
-  applications: string[];
-  [key: string]: any;
-}
-
-// 定義啟動應用程式的回應介面
-interface LaunchAppResponse {
-  message: string;
-  [key: string]: any;
-}
-
 // 列出所有可用工具
 async function listTools(client: Client): Promise<void> {
   try {
@@ -76,17 +59,8 @@ async function listApplications(client: Client): Promise<void> {
       arguments: {},
     });
 
-    // validate result
-    const validatedResult = WrappedListApplicationsOutputSchema.parse(result);
-
     console.log("已安裝的應用程式:");
-    console.log(validatedResult);
-
-    validatedResult.toolResult.applications.forEach(
-      (app: string, index: number) => {
-        console.log(`${index + 1}. ${app}`);
-      }
-    );
+    console.log(result);
   } catch (error) {
     console.error("獲取應用程式列表時發生錯誤:", error);
   }
@@ -102,10 +76,7 @@ async function launchApp(client: Client, appName: string): Promise<void> {
         appName: appName,
       },
     });
-    // validate result
-    const validatedResult = WrappedLaunchAppOutputSchema.parse(result);
-
-    console.log(`結果: ${validatedResult.toolResult.message}`);
+    console.log(`結果`, result);
   } catch (error) {
     console.error("啟動應用程式時發生錯誤:", error);
   }
@@ -126,10 +97,7 @@ async function openWithApp(
         filePath: filePath,
       },
     });
-    // validate result
-    const validatedResult = WrappedOpenWithAppOutputSchema.parse(result);
-
-    console.log(`結果: ${validatedResult.toolResult.message}`);
+    console.log(`結果`, result);
   } catch (error) {
     console.error("用應用程式開啟檔案時發生錯誤:", error);
   }

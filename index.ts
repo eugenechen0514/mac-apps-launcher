@@ -4,20 +4,14 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  type CallToolResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import { exec } from "child_process";
 import { promisify } from "util";
 import { readdir } from "fs/promises";
 import { join } from "path";
-import { z } from "zod";
 import { tools } from "./tools";
-import {
-  LaunchAppInputSchema,
-  LaunchAppOutputSchema,
-  ListApplicationsOutputSchema,
-  OpenWithAppInputSchema,
-  OpenWithAppOutputSchema,
-} from "./schemas";
+import { LaunchAppInputSchema, OpenWithAppInputSchema } from "./schemas";
 
 const execAsync = promisify(exec);
 
@@ -86,44 +80,57 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     switch (request.params.name) {
       case "list_applications": {
         const apps = await listApplications();
-        return {
-          toolResult: ListApplicationsOutputSchema.parse({
-            applications: apps,
-          }),
+        const appListString = apps.reduce((acc, app, index) => {
+          return `${acc}${index + 1}. ${app}\n`;
+        }, "");
+        const toolResult: CallToolResult = {
+          content: [{ type: "text", text: appListString }],
         };
+        return toolResult;
       }
       case "launch_app": {
         const args = LaunchAppInputSchema.parse(request.params.arguments);
         const success = await launchApp(args.appName);
-        return {
-          toolResult: LaunchAppOutputSchema.parse({
-            success,
-            message: success
-              ? "Application launched successfully"
-              : "Failed to launch application",
-          }),
+        const toolResult: CallToolResult = {
+          content: [
+            {
+              type: "text",
+              text: success
+                ? "Application launched successfully"
+                : "Failed to launch application",
+            },
+          ],
         };
+        return toolResult;
       }
       case "open_with_app": {
         const args = OpenWithAppInputSchema.parse(request.params.arguments);
         const success = await openWithApp(args.appName, args.filePath);
-        return {
-          toolResult: OpenWithAppOutputSchema.parse({
-            success,
-            message: success
-              ? "File opened successfully"
-              : "Failed to open file with application",
-          }),
+        const toolResult: CallToolResult = {
+          content: [
+            {
+              type: "text",
+              text: success
+                ? "File opened successfully"
+                : "Failed to open file with application",
+            },
+          ],
         };
+        return toolResult;
       }
       default:
         throw new Error(`Unknown tool: ${request.params.name}`);
     }
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw new Error("Invalid arguments");
-    }
-    throw error;
+  } catch (error: unknown) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: error instanceof Error ? error.message : "Unknown error",
+        },
+      ],
+      isError: true,
+    };
   }
 });
 
