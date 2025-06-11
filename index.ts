@@ -9,7 +9,14 @@ import { promisify } from "util";
 import { readdir } from "fs/promises";
 import { join } from "path";
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
+import { tools } from "./tools";
+import {
+  LaunchAppInputSchema,
+  LaunchAppOutputSchema,
+  ListApplicationsOutputSchema,
+  OpenWithAppInputSchema,
+  OpenWithAppOutputSchema,
+} from "./schemas";
 
 const execAsync = promisify(exec);
 
@@ -63,66 +70,9 @@ const server = new Server(
   }
 );
 
-// helper
-function wrapToolResultSchema<T>(schema: z.ZodType<T>) {
-  return z.object({
-    toolResult: schema,
-  });
-}
-
-// Define schemas
-const ListApplicationsOutputSchema = z.object({
-  applications: z.array(z.string()),
-});
-export const WrappedListApplicationsOutputSchema = wrapToolResultSchema(
-  ListApplicationsOutputSchema
-);
-
-const LaunchAppInputSchema = z.object({
-  appName: z.string(),
-});
-
-const LaunchAppOutputSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-});
-export const WrappedLaunchAppOutputSchema = wrapToolResultSchema(
-  LaunchAppOutputSchema
-);
-
-const OpenWithAppInputSchema = z.object({
-  appName: z.string(),
-  filePath: z.string(),
-});
-
-const OpenWithAppOutputSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-});
-export const WrappedOpenWithAppOutputSchema = wrapToolResultSchema(
-  OpenWithAppOutputSchema
-);
-
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
-    tools: [
-      {
-        name: "list_applications",
-        description:
-          "List all applications installed in the /Applications folder",
-        inputSchema: zodToJsonSchema(z.object({})),
-      },
-      {
-        name: "launch_app",
-        description: "Launch a Mac application by name",
-        inputSchema: zodToJsonSchema(LaunchAppInputSchema),
-      },
-      {
-        name: "open_with_app",
-        description: "Open a file or folder with a specific application",
-        inputSchema: zodToJsonSchema(OpenWithAppInputSchema),
-      },
-    ],
+    tools,
   };
 });
 
