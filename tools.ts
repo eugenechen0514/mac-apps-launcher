@@ -1,8 +1,9 @@
 import z from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { LaunchAppInputSchema, OpenWithAppInputSchema } from "./schemas";
+import { type Tool } from "@modelcontextprotocol/sdk/types.js";
 
-export const tools = [
+export const tools: Tool[] = [
   {
     name: "list_applications",
     description: "List all applications installed in the /Applications folder",
