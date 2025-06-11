@@ -5,7 +5,7 @@ import {
   WrappedLaunchAppOutputSchema,
   WrappedListApplicationsOutputSchema,
   WrappedOpenWithAppOutputSchema,
-} from "../src/index.js";
+} from "../index.js";
 
 // 建立使用者輸入介面
 const userInput: Interface = createInterface({
@@ -20,8 +20,8 @@ async function initClient(): Promise<Client> {
 
     // 建立 StdioClientTransport，指定要執行的命令
     const transport = new StdioClientTransport({
-      command: "node",
-      args: ["dist/src/index.js"],
+      command: "bun",
+      args: ["index.ts"],
     });
 
     // 建立 MCP 客戶端

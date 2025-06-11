@@ -53,7 +53,7 @@ async function openWithApp(
 
 const server = new Server(
   {
-    name: "mac-launcher",
+    name: "Mac Apps Launcher MCP Server",
     version: "1.0.0",
   },
   {

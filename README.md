@@ -18,7 +18,7 @@ Add the following to your Claude Config JSON file
 {
   "mcpServers": {
     "simulator": {
-      "command": "npx",
+      "command": "bunx",
       "args": [
         "@eugenechen/mac-apps-launcher-mcp-server"
       ]
