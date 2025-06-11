@@ -17,10 +17,10 @@ Add the following to your Claude Config JSON file
 ```
 {
   "mcpServers": {
-    "simulator": {
+    "mac-apps-launcher-mcp": {
       "command": "bunx",
       "args": [
-        "@eugenechen/mac-apps-launcher-mcp-server"
+        "@eugenechen/mac-apps-launcher-mcp-server@latest"
       ]
     }
   }

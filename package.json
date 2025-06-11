@@ -1,12 +1,12 @@
 {
   "name": "@eugenechen/mac-apps-launcher-mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server for launching applications on macOS",
   "license": "MIT",
   "type": "module",
   "module": "index.ts",
   "bin": {
-    "mcp-server": "index.ts"
+    "mac-apps-launcher-mcp": "index.ts"
   },
   "scripts": {
     "start": "bun index.ts",
