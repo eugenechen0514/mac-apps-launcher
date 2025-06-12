@@ -1,3 +1,5 @@
+Fork from: [JoshuaRileyDev/mac-apps-launcher](https://github.com/JoshuaRileyDev/mac-apps-launcher)
+
 # Mac Apps Launcher MCP Server
 
 A Model Context Protocol (MCP) server for launching and managing macOS applications.
