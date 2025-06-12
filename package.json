@@ -1,6 +1,6 @@
 {
   "name": "@eugenechen/mac-apps-launcher-mcp-server",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "MCP server for launching applications on macOS",
   "license": "MIT",
   "type": "module",

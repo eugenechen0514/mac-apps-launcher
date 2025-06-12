@@ -16,25 +16,20 @@ function loadTools(server: McpServer, tools: ToolConfig[]) {
 }
 
 function initServer() {
-  const server = new McpServer(
-    {
-      name: "Mac Apps Launcher MCP Server",
-      version: "1.0.0",
-    },
-    {
-      capabilities: {
-        tools: {},
-      },
-    }
-  );
+  const server = new McpServer({
+    name: "Mac Apps Launcher MCP Server",
+    version: "1.0.0",
+  });
   loadTools(server, tools);
   return server;
 }
 
 async function runServer() {
   const server = initServer();
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
+
   console.error("Mac Launcher MCP Server running on stdio");
 }
 
