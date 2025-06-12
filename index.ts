@@ -8,8 +8,8 @@ function loadTools(server: McpServer, tools: ToolConfig[]) {
     server.tool(
       tool.name,
       tool.description,
-      tool.annotations,
       tool.schema,
+      tool.annotations,
       tool.cb
     );
   });
