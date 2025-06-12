@@ -6,7 +6,10 @@ import {
   ListApplicationsInputSchema,
 } from "./schemas";
 import { type ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type {
+  CallToolResult,
+  ToolAnnotations,
+} from "@modelcontextprotocol/sdk/types.js";
 import { launchApp, listApplications } from "./utils";
 
 function extractSchemaForMCPTool(schema: any) {
@@ -25,7 +28,8 @@ export interface ToolConfig<Args extends undefined | ZodRawShape = undefined> {
   name: string;
   description: string;
   inputSchema: any;
-  schema: z.AnyZodObject;
+  annotations: ToolAnnotations;
+  schema: Args;
   cb: ToolCallback<Args>;
 }
 
@@ -34,6 +38,13 @@ export const tools: ToolConfig[] = [
     name: "list_applications",
     description: "List all applications installed in the /Applications folder",
     inputSchema: extractSchemaForMCPToolOutput(ListApplicationsInputSchema),
+    annotations: {
+      title: "列出所有應用程式",
+      readOnlyHint: true, // 只讀取應用程式列表，不修改系統
+      destructiveHint: false, // 不執行任何破壞性操作
+      idempotentHint: true, // 重複呼叫會得到相同結果(若應用程式列表未變)
+      openWorldHint: false, // 只與本機檔案系統互動，不連接外部系統
+    },
     schema: ListApplicationsInputSchema,
     cb: async () => {
       const apps = await listApplications();
@@ -50,6 +61,13 @@ export const tools: ToolConfig[] = [
     name: "launch_app",
     description: "Launch a Mac application by name",
     inputSchema: extractSchemaForMCPToolOutput(LaunchAppInputSchema),
+    annotations: {
+      title: "啟動應用程式",
+      readOnlyHint: false, // 會修改系統狀態(啟動應用程式)
+      destructiveHint: false, // 不執行破壞性操作
+      idempotentHint: false, // 重複啟動可能有不同結果
+      openWorldHint: true, // 與外部應用程式互動
+    },
     schema: LaunchAppInputSchema,
     cb: async (args) => {
       const success = await launchApp(args.appName);
@@ -70,6 +88,13 @@ export const tools: ToolConfig[] = [
     name: "open_with_app",
     description: "Open a file or folder with a specific application",
     inputSchema: extractSchemaForMCPToolOutput(OpenWithAppInputSchema),
+    annotations: {
+      title: "用應用程式開啟檔案",
+      readOnlyHint: false, // 會修改系統狀態
+      destructiveHint: false, // 不執行破壞性操作
+      idempotentHint: false, // 重複開啟可能有不同結果
+      openWorldHint: true, // 與外部應用程式和檔案互動
+    },
     schema: OpenWithAppInputSchema,
     cb: async (args) => {
       const success = await openWithApp(args.appName, args.filePath);

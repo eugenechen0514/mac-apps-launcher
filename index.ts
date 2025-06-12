@@ -5,7 +5,13 @@ import { tools, type ToolConfig } from "./tools";
 
 function loadTools(server: McpServer, tools: ToolConfig[]) {
   tools.forEach((tool) => {
-    server.tool(tool.name, tool.schema, tool.cb);
+    server.tool(
+      tool.name,
+      tool.description,
+      tool.annotations,
+      tool.schema,
+      tool.cb
+    );
   });
 }
 
