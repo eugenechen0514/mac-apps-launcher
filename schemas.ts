@@ -1,6 +1,6 @@
 import z from "zod";
 
-// Define schemas
+export const ListApplicationsInputSchema = z.object({});
 export const LaunchAppInputSchema = z.object({
   appName: z.string(),
 });
